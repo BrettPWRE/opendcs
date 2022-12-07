@@ -1,44 +1,23 @@
 package decodes.hdb.algo;
 
-import java.sql.Connection;
-import java.util.Date;
-
-import ilex.var.NamedVariableList;
-import ilex.var.NamedVariable;
-import decodes.tsdb.DbAlgorithmExecutive;
-import decodes.tsdb.DbCompException;
-import decodes.tsdb.DbIoException;
-import decodes.tsdb.VarFlags;
-import decodes.tsdb.algo.AWAlgoType;
-import decodes.util.PropertySpec;
-import decodes.tsdb.CTimeSeries;
-import decodes.tsdb.ParmRef;
-import ilex.var.TimedVariable;
-import decodes.tsdb.TimeSeriesIdentifier;
-import decodes.tsdb.IntervalIncrement;
-
-//AW:IMPORTS
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.TimeZone;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import decodes.hdb.dbutils.DBAccess;
 import decodes.hdb.dbutils.DataObject;
 import decodes.sql.DbKey;
-import decodes.tsdb.IntervalCodes;
+import decodes.tsdb.DbCompException;
 import decodes.tsdb.ParmRef;
-import ilex.var.TimedVariable;
-import ilex.var.NoConversionException;
+import decodes.tsdb.algo.AWAlgoType;
+import decodes.util.PropertySpec;
+import ilex.var.NamedVariable;
+
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.TimeZone;
 //AW:IMPORTS_END
 
 //AW:JAVADOC
 /**
-Type a javadoc-style comment describing the algorithm class.
 
 
  */
@@ -49,7 +28,7 @@ public class CULPowerTemporalDisagg
 //AW:INPUTS
 	public double AnnualInput;	//AW:TYPECODE=i
 	public double CoefficientInput;
-	String _inputNames[] = { "AnnualInput" , "CoefficientInput"};
+	String[] _inputNames = { "AnnualInput" , "CoefficientInput"};
 //AW:INPUTS_END
 
 //AW:LOCALVARS
@@ -65,19 +44,19 @@ public class CULPowerTemporalDisagg
     PropertySpec[] specs =
         {
         		new PropertySpec("coeff_year", PropertySpec.INT,
-                        "(1985) What year to write coefficients into"),
+                        "(1985) What year to read coefficients from, currently unused!"),
         };
 
 //AW:LOCALVARS_END
 
 //AW:OUTPUTS
 	public NamedVariable MonthlyOutput = new NamedVariable("MonthlyOutput", 0);
-	String _outputNames[] = { "MonthlyOutput" };
+	String[] _outputNames = { "MonthlyOutput" };
 //AW:OUTPUTS_END
 
 //AW:PROPERTIES
     public long coeff_year = 1985;
-	String _propertyNames[] = { "coeff_year" };
+	String[] _propertyNames = { "coeff_year" };
 //AW:PROPERTIES_END
 
 	// Allow javac to generate a no-args constructor.
@@ -186,8 +165,8 @@ public class CULPowerTemporalDisagg
         	return;
         }
         else if (count == 1) {
-        	YearstoDisagg = new ArrayList<Object>();
-        	AnnualSourceData = new ArrayList<Object>();
+        	YearstoDisagg = new ArrayList<>();
+        	AnnualSourceData = new ArrayList<>();
         	
         	YearstoDisagg.add(dbobj.get("year"));
         	AnnualSourceData.add(dbobj.get("value"));
@@ -209,8 +188,7 @@ public class CULPowerTemporalDisagg
 		ArrayList<Object> monthlyCoefficients = (ArrayList<Object>) dbobj.get("value");
 		if(monthlyCoefficients.size() != 12)
 		{
-			System.out.println("Something wrong with monthly coefficients"); // improve error handling
-			return;
+			throw new DbCompException("Something wrong with monthly coefficients in query: " + query + status);
 		}
 
 		
@@ -238,8 +216,8 @@ public class CULPowerTemporalDisagg
             // Monthly volume (for months without source data) = Volume to distribute * monthly coefficient / sum of monthly coefficients w/o source data
             ArrayList<Object> monthlySourceData = null;
             ArrayList<Object> monthlySourceMonths = null;
-            Double monthlySourceSum = 0.0;
-            Double monthlyCoefficientSum = 0.0;
+            double monthlySourceSum = 0.0;
+            double monthlyCoefficientSum = 0.0;
             if(dbobj.get("value").toString().isEmpty())
             {
             	monthlySourceData = null;
