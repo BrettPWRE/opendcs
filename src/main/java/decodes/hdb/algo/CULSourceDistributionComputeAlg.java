@@ -67,7 +67,7 @@ public class CULSourceDistributionComputeAlg
         extends decodes.tsdb.algo.AW_AlgorithmBase
 {
     //AW:INPUTS
-    public double input;	//AW:TYPECODE=i
+    public double input;    //AW:TYPECODE=i
     String[] _inputNames = { "input" };
 //AW:INPUTS_END
 
@@ -79,7 +79,7 @@ public class CULSourceDistributionComputeAlg
     boolean do_setoutput = true;
     Connection conn = null;
 
-    private static final Pattern loadappPattern = Pattern.compile("^\\w+$"); //only alphanumeric+_ allowed
+    private static final Pattern loadappPattern = Pattern.compile("^\\w*$"); //only alphanumeric+_ allowed
 
     PropertySpec[] specs =
             {
